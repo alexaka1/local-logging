@@ -1,0 +1,41 @@
+name: local-logging
+services:
+  seq:
+    image: datalust/seq:latest
+    restart: unless-stopped
+    ports:
+      - "5341:5341"
+      - "5342:80"
+    volumes:
+      - seq:/data
+    environment:
+      - ACCEPT_EULA=Y
+    networks:
+      - local-logging
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
+    restart: unless-stopped
+    ports:
+      - "18888:18888" # dashboard
+      - "18889:18889" # OTLP gRPC receiver
+      - "18890:18890" # OTLP http receiver
+    environment:
+      - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true
+    networks:
+      - local-logging
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    restart: unless-stopped
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP http receiver
+      - "13133:13133" # health_check extension
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml:ro
+    command: [ "--config=/etc/otel-collector-config.yml" ]
+    networks:
+      - local-logging
+volumes:
+  seq:
+networks:
+  local-logging:

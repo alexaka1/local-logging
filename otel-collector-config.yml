@@ -1,0 +1,51 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  batch:
+exporters:
+  debug:
+    verbosity: detailed
+  otlphttp/seq:
+    logs_endpoint: http://seq:5341/ingest/otlp/v1/logs
+    traces_endpoint: http://seq:5341/ingest/otlp/v1/traces
+    tls:
+      insecure: true
+  otlp/aspire:
+    endpoint: 'http://aspire-dashboard:18889'
+    tls:
+      insecure: true
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+service:
+  extensions:
+    - health_check
+  pipelines:
+    logs:
+      receivers:
+        - otlp
+      processors:
+        - batch
+      exporters:
+        - otlphttp/seq
+        - otlp/aspire
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - batch
+      exporters:
+        - otlphttp/seq
+        - otlp/aspire
+    metrics:
+      receivers:
+        - otlp
+      processors:
+        - batch
+      exporters:
+        - otlp/aspire
