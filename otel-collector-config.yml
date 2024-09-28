@@ -11,8 +11,7 @@ exporters:
   debug:
     verbosity: detailed
   otlphttp/seq:
-    logs_endpoint: http://seq:5341/ingest/otlp/v1/logs
-    traces_endpoint: http://seq:5341/ingest/otlp/v1/traces
+    endpoint: http://seq:5341/ingest/otlp
     tls:
       insecure: true
   otlp/aspire:
