@@ -10,6 +10,7 @@ services:
       - seq:/data
     environment:
       - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
     networks:
       - local-logging
   aspire-dashboard:
